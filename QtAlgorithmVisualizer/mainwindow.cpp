@@ -27,7 +27,7 @@ MainWindow::MainWindow(QGraphicsScene* mainScene) : QGraphicsView{mainScene}
 
      array = new Unit[array_size];
      filler = new RectFiller;
-     sort_thread = new SortThread(array, array_size, shell_sort<Unit*>);//bubble_sort<Unit*>);
+     sort_thread = new SortThread(array, array_size, merge_sort<Unit*>);//bubble_sort<Unit*>);
   qDebug()<< "array: " << array << "array_size: "<< array_size;
      QRect rec =
              QApplication::desktop()->screenGeometry();
