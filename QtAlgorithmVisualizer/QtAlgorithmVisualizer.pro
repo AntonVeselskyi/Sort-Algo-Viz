@@ -33,3 +33,6 @@ HEADERS += \
     rectfiller.hpp \
     unit.h \
     sortthread.hpp
+
+#INCLUDEPATH += "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10586.0/ucrt"
+#LIBS += -L"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.10586.0/ucrt/x64"

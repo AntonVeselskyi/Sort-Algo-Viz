@@ -39,7 +39,7 @@ class MainWindow : public QGraphicsView
 private:
     int window_h = 0;
     int window_w = 0;
-    int array_size = 25;
+    int array_size = 60;
 
     //leftbottom column position
     float shift;
@@ -167,62 +167,112 @@ template<class T> inline
     void merge_sort(T first, T last)
 {
     int N = (last-first); //size
-    qDebug() << N;
-    if (N == 1)
+
+    qDebug() <<"N: -->  " << N << "L:" <<(last-1)->value() <<" M_L: " << first[N-1].value();
+    if (N <= 1)
     {return;}
 
-    //separating
-   // merge_sort(first, first +  N / 2 ); //left half
-    //merge_sort(first +  N / 2 +1, last); //right half
-
-    //at this point two upper funcs woll return sorted halfs
-
     T left_start_iterator = first;
-    T right_start_iterator = first + N/2;
+    T right_start_iterator = &first[N/2];
 
-    Unit* tmp_elements = new Unit[N];
+    //separating
+    merge_sort(left_start_iterator, right_start_iterator); //left half
+    merge_sort(right_start_iterator , last); //right half
+
+    //at this point two upper funcs will return sorted halfs
+
+     qDebug() <<"after N: -->  " << N;
+
+     Unit* tmp_elements = new Unit[N];
+     qDebug() <<"TMP array: -->  " << &(tmp_elements[N-1])  - tmp_elements;
+
    // tmp_elements_vec.resize(N);
    // T tmp_elements = tmp_elements_vec[0];
 
     //the merging itself
     while(true)
     {
-       if(*left_start_iterator < *right_start_iterator) //compare right and left half by elements
+       if(*left_start_iterator > *right_start_iterator) //compare right and left half by elements
        {
 
-            memcpy(tmp_elements, left_start_iterator, 4);
-           tmp_elements++; left_start_iterator++;
+          *tmp_elements = ((Unit*)left_start_iterator)->value();
+          tmp_elements++; left_start_iterator++;
 
-           if(left_start_iterator == first + N/2)
+           if(left_start_iterator == &first[N/2])
            {
-               //copy what`s left
-               memcpy(/*where*/tmp_elements,
-                       /*what*/ right_start_iterator,
-                      /*how much*/ ((char*)last - (char*)right_start_iterator) );
+               //copy what`s right
+               while(right_start_iterator != last)
+               {
+                    tmp_elements[0] =  ((Unit*)right_start_iterator)->value();
+                    tmp_elements++; right_start_iterator++;
+               }
+               qDebug() << "copied whats left";
                break;
            }
        }
        else
        {
-            memcpy(tmp_elements, right_start_iterator, 4);
+            *tmp_elements = ((Unit*)right_start_iterator)->value();
 
            tmp_elements++; right_start_iterator++;
            if(right_start_iterator == last) //copy part that has`nt been copied
            {
-
-              memcpy(/*where*/tmp_elements,
-                       /*what*/ left_start_iterator,
-                       /*how much*/ ((char*)(first + N/2) - (char*)left_start_iterator) );
-               break;
+                //copy what`s left
+               while(left_start_iterator != &first[N/2])
+               {
+                  // qDebug() <<"~2";
+                    tmp_elements[0] =  ((Unit*)left_start_iterator)->value();
+                    tmp_elements++; left_start_iterator++;
+               }
+               qDebug() << "copied whats right";
+              break;
            }
        }
     }
 
+    tmp_elements-=N;
     for(int i = 0; i < N; ++i)
     {
+        qDebug() << tmp_elements[i].value();
         qSwap(first[i], tmp_elements[i]);
     }
-    delete tmp_elements;
+    qDebug() << "___________________________";
+    delete [] tmp_elements;
+}
+
+
+
+
+
+int mpartition(Unit *arr, const int left, const int right) ;
+
+void mquicksort(Unit *arr, const int left, const int right, const int sz);
+
+template<class T> inline
+    void mq_sort(T first, T last);
+
+#define GAP 100
+template<class T> inline
+    void count_sort(T first, T last)
+{
+
+    int count_array[GAP] = {0};
+    int N = (last-first); //size
+
+   for(int i = 0; i<N; i++, first++)
+        count_array[ ( (Unit*)first )->value() ] ++;
+
+    Unit* tmp_elements = new Unit[N];
+    for(int i = 0; i < GAP; i++)
+        for(int j = 0; j < count_array[i]; j++, tmp_elements++)
+            *tmp_elements = i;
+
+    first-=N;
+    tmp_elements-=N;
+    for(int i = 0; i<N; i++, first++, tmp_elements++)
+        qSwap(*first, *tmp_elements);
+
+    delete [] (tmp_elements-N);
 }
 
 

@@ -16,7 +16,57 @@
 #include <QDebug>
 
 
+int* var5(int size) //viluchiti modu
+{
+    int *arr = new int[size];
 
+    for (int i=0; i <size; i++)
+     arr[i] = ((int) qrand() % 100);  //  0 < value < 100
+
+     //find modu
+     int good_index = 0, max_counter =0, counter =0;
+     for (int i=0; i <size; i++)
+     {
+         counter=1;
+         for (int j=0; j <size; j++)
+         {
+             if (arr[i] == arr[j])
+             {
+                 counter ++;
+             }
+         }
+
+         if (counter>max_counter)
+         {
+             good_index = i;
+             max_counter = counter;
+         }
+     }
+
+
+     qDebug() << "moda - " << arr[good_index] << " count: " <<max_counter;
+     //remove all modu samples, change them to 1000
+     int good_value = arr[good_index];
+     for(int i=0; i <size; i++)
+     {
+         if(arr[i] == good_value)
+             arr[i] = 100;
+     }
+
+     return arr;
+}
+
+#include <QtMath>
+int* var6(int size) //sin
+{
+    int *arr = new int[size];
+
+    for (int i=0; i < size; i++)
+     arr[i] = abs(qSin(((int) qrand() % 100))*100);  //  0 < value < 100
+
+    return arr;
+
+}
 
 MainWindow::MainWindow(QGraphicsScene* mainScene) : QGraphicsView{mainScene}
   ,	main_scene{mainScene}
@@ -27,7 +77,7 @@ MainWindow::MainWindow(QGraphicsScene* mainScene) : QGraphicsView{mainScene}
 
      array = new Unit[array_size];
      filler = new RectFiller;
-     sort_thread = new SortThread(array, array_size, merge_sort<Unit*>);//bubble_sort<Unit*>);
+     sort_thread = new SortThread(array, array_size, count_sort<Unit*>);//bubble_sort<Unit*>);
   qDebug()<< "array: " << array << "array_size: "<< array_size;
      QRect rec =
              QApplication::desktop()->screenGeometry();
@@ -45,8 +95,10 @@ MainWindow::MainWindow(QGraphicsScene* mainScene) : QGraphicsView{mainScene}
       font.setBold(false);
       font.setFamily("Calibri");
 
+      int *array_dodatkove = var6(array_size);
+
       for (auto i = 0; i < array_size; ++i) {
-          array[i] = ((int) qrand() % 100);  //  0 < value < 100
+          array[i] = array_dodatkove[i];  //  0 < value < 100
 
           // add the graphic Rectangle Items to the Scene
           QGraphicsRectItem* columnRect = main_scene->addRect(i*shift,  window_h- ((array[i]/100.0)*(float)window_h),
@@ -78,6 +130,7 @@ MainWindow::MainWindow(QGraphicsScene* mainScene) : QGraphicsView{mainScene}
       start = QDateTime::currentDateTime();
       sort_thread->start();
 
+      delete array_dodatkove;
 
 
 
@@ -148,4 +201,53 @@ void MainWindow::ending_slot()
    filler->clearFill();
 
 }
+
+int mpartition(Unit *arr, const int left, const int right)
+{
+    const int mid = left + (right - left) / 2;
+    const int pivot = arr[mid];
+    // move the mid point value to the front.
+    std::swap(arr[mid],arr[left]);
+    int i = left + 1;
+    int j = right;
+    while (i <= j) {
+        while(i <= j && arr[i] <= pivot) {
+            i++;
+        }
+
+        while(i <= j && arr[j] > pivot) {
+            j--;
+        }
+
+        if (i < j) {
+            std::swap(arr[i], arr[j]);
+        }
+    }
+    std::swap(arr[i - 1],arr[left]);
+    return i - 1;
+}
+
+void mquicksort(Unit *arr, const int left, const int right, const int sz){
+
+    if (left >= right) {
+
+        return;
+    }
+
+
+    int part = mpartition(arr, left, right);
+
+
+    mquicksort(arr, left, part - 1, sz);
+    mquicksort(arr, part + 1, right, sz);
+}
+
+//QUICK SORT
+template<class T> inline
+    void mq_sort(T first, T last)
+{
+    int N = (last-first); //size
+    mquicksort((Unit*)first, 0, N-1, N);
+}
+
 

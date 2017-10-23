@@ -28,7 +28,8 @@ public:
     void set_columnV(QGraphicsTextItem* columnV) {  column_value = columnV; }
     QGraphicsRectItem* get_columnRect() const { return column_rect; }
     QGraphicsTextItem* get_columnV() const { return column_value; }
-
+    void set_value(int v){}
+    int value() {return value_;}
 signals:
     void operatorCOMP(QGraphicsRectItem* item1, QGraphicsRectItem* item2); //when we compare RED
     void operatorEQ(QGraphicsRectItem* item,  QGraphicsTextItem* text, float val); //when we change value GREEN
