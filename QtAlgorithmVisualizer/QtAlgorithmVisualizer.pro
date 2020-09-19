@@ -31,6 +31,7 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
     rectfiller.hpp \
+    sort_funcs.hpp \
     unit.h \
     sortthread.hpp
 

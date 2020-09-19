@@ -1,20 +1,20 @@
-#ifndef RECTFILLER
-#define RECTFILLER
+#pragma once
 
 #include <QGraphicsRectItem>
 #include <QList>
 #include "QBrush"
 
-class RectFiller {
+class RectFiller
+{
 public:
-    void fillItem(QGraphicsRectItem* item, QColor color) {
-    //    QBrush s();
-      //  s.setColor(color);
+    void fillItem(QGraphicsRectItem* item, QColor color)
+    {
         item->setBrush(color);
         filledList.append(item);
     }
 
-    void clearFill() {
+    void clearFill()
+    {
         for (auto& item : filledList)
             item->setBrush(Qt::white);
         filledList.clear();
@@ -23,6 +23,3 @@ public:
 private:
     QList<QGraphicsRectItem*> filledList;
 };
-
-#endif // RECTFILLER
-
