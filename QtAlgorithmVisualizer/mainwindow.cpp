@@ -1,25 +1,25 @@
 #include "mainwindow.h"
 #include "unit.h"
 #include "sortthread.hpp"
+#include "sort_funcs.hpp"
+
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
-#include <QTime>
 #include <QObject>
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QRectF>
-#include <algorithm>
-#include <functional>
 #include <QApplication>
 #include "QDesktopWidget"
 #include <QDebug>
-#include <sort_funcs.hpp>
+#include <algorithm>
+#include <functional>
 
 
-MainWindow::MainWindow(QGraphicsScene* mainScene)
-    : QGraphicsView{mainScene},
-      main_scene{mainScene}
+MainWindow::MainWindow(QGraphicsScene* mainScene) :
+                       QGraphicsView{mainScene},
+                       main_scene{mainScene}
 {
     qsrand(QTime::currentTime().msec());
 
@@ -29,7 +29,6 @@ MainWindow::MainWindow(QGraphicsScene* mainScene)
     array = new Unit[array_size];
     qDebug()<< "array: " << array << "array_size: "<< array_size;
     filler = new RectFiller;
-    sort_thread = new SortThread(array, array_size, merge_sort<Unit*>);//bubble_sort<Unit*>);
 
     setWindowState(Qt::WindowMaximized);
     QRect rec = QApplication::desktop()->screenGeometry();
@@ -45,13 +44,15 @@ MainWindow::MainWindow(QGraphicsScene* mainScene)
     font.setBold(false);
     font.setFamily("Calibri");
 
+    //allocte array of objects to sort with random values (from 0 to 100)
     for (auto i = 0; i < array_size; ++i)
     {
         array[i] = qrand()%100;  //  0 < value < 100
 
         // add the graphic Rectangle Items to the Scene
-        QGraphicsRectItem* columnRect = main_scene->addRect(i*shift,  window_h- ((array[i]/100.0)*(float)window_h),
+        QGraphicsRectItem* columnRect = main_scene->addRect(i*shift,  window_h - ((array[i]/100.0)*(float)window_h),
                                               column_width, (array[i]/100.0)*(float)window_h);
+        //add label only if there less then 70 elements (readability)
         if (array_size<=70)
         {
             QGraphicsTextItem* value_label = new QGraphicsTextItem;
@@ -75,10 +76,6 @@ MainWindow::MainWindow(QGraphicsScene* mainScene)
                          this, SLOT(comp_slot(QGraphicsRectItem*,QGraphicsRectItem*)));
     }
 
-    QObject::connect(sort_thread, SIGNAL(end_of_run()), this, SLOT(ending_slot()));
-
-    start = QDateTime::currentDateTime();
-    sort_thread->start();
 }
 
 MainWindow::~MainWindow()
@@ -89,6 +86,16 @@ MainWindow::~MainWindow()
     delete stat;
     delete filler;
     delete[] array;
+}
+
+void MainWindow::startSort()
+{
+    if(sort_thread)
+        delete sort_thread;
+
+    sort_thread = new SortThread(array, array_size, shell_sort<Unit*>);//e.g. bubble_sort<Unit*>
+    QObject::connect(sort_thread, SIGNAL(end_of_run(qint64)), this, SLOT(ending_slot(qint64)));
+    sort_thread->start();
 }
 
 SortInfo::SortInfo(QGraphicsTextItem* compText, QGraphicsTextItem* compNum,
@@ -116,31 +123,29 @@ void SortInfo::plus_assign()
 
 void MainWindow::assign_slot(QGraphicsRectItem* item,  QGraphicsTextItem* text, float relativeHeight)
 {
-   filler->clearFill();
-   float newHeight = relativeHeight * (float)window_h;
-   float x = item->rect().x();
-   float y = (float)window_h - newHeight;
-   float width = column_width;
-   item->setRect(x, y, width, newHeight);
-   text->setPos(x, y - 30);
-   text->setPlainText(QString::number(relativeHeight*100));
+    filler->clearFill();
+    float newHeight = relativeHeight * (float)window_h;
+    float x = item->rect().x();
+    float y = (float)window_h - newHeight;
+    float width = column_width;
+    item->setRect(x, y, width, newHeight);
+    if (array_size<=70)
+    {
+        text->setPos(x, y - 30);
+        text->setPlainText(QString::number(relativeHeight*100));
+    }
+    filler->fillItem(item, Qt::green);
 
-   filler->fillItem(item, Qt::green);
-
-   stat->plus_assign();
+    stat->plus_assign();
 }
 
 void MainWindow::comp_slot(QGraphicsRectItem* item1, QGraphicsRectItem* item2)
 {
-   stat->plus_comp();
+    stat->plus_comp();
 }
 
-void MainWindow::ending_slot()
+void MainWindow::ending_slot(qint64 ms)
 {
-    QDateTime finish = QDateTime::currentDateTime();
-    int secs = start.secsTo(finish),
-        ms = start.msecsTo(finish);
-
-    main_scene->addText("\n\n\nSorted in " + QString::number(secs) + " sec ("+ QString::number(ms) + "ms)");
+    main_scene->addText("\n\n\nSorted in " + QString::number(ms) + "ms");
     filler->clearFill();
 }

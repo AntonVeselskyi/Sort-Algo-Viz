@@ -14,7 +14,7 @@ public:
     QGraphicsRectItem* column_rect;
     QGraphicsTextItem* column_value;
     Unit();
-    ~Unit() {}
+    ~Unit() = default;
     Unit(Unit&&);
     Unit& operator=(Unit&&);
     Unit& operator=(int);

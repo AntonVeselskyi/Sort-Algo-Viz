@@ -42,27 +42,27 @@ private:
     //leftbottom column position
     float shift;
     float column_width;
-    QDateTime start; //start time
 
     // the scene to draw
-    QGraphicsScene* main_scene;
+    QGraphicsScene *main_scene;
     // the thread that runs the sorting
-    SortThread* sort_thread;
+    SortThread *sort_thread = nullptr;
 
     // the array to be sorted
-    Unit* array;
+    Unit *array;
     RectFiller *filler;
-    SortInfo* stat;
+    SortInfo *stat;
 
+    inline void setSizeDependentVars()
+    { shift = window_w/array_size; column_width = shift-PADDING; }
 public:
     MainWindow(QGraphicsScene* mainScene);
     ~MainWindow();
-    inline void setSizeDependentVars()
-    { shift = window_w/array_size; column_width = shift-PADDING; }
+    void startSort();
 
 public slots:
     // changes the rectangle item's height in the GraphicsScene. 0 < relativeHeight < maximumHeight ( = windowHeight)
     void assign_slot(QGraphicsRectItem* item,  QGraphicsTextItem* text, float relativeHeight);
     void comp_slot(QGraphicsRectItem* item1, QGraphicsRectItem* item2);
-    void ending_slot();
+    void ending_slot(qint64 ms);
 };

@@ -4,6 +4,8 @@
 #include <QList>
 #include "QBrush"
 
+// class that can fill QGraphicsRectItem with color
+// and clear all filled elements (will with white)
 class RectFiller
 {
 public:

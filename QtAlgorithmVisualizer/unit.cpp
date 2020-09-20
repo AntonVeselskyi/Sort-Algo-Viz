@@ -12,6 +12,7 @@ Unit::Unit(Unit&& other)
 
 Unit& Unit::operator=(Unit&& other)
 {
+    //this class should manage the rect on the scene
     value_ = other.value_;
     emit operatorEQ(column_rect, column_value,  value_/100.0);
 

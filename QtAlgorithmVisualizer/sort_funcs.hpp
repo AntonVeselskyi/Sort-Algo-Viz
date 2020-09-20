@@ -1,9 +1,5 @@
 #pragma once
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QGraphicsRectItem>
 #include <QDebug>
-#include <QDateTime>
 
 #include "rectfiller.hpp"
 #include "sortthread.hpp"

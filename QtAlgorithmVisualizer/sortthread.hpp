@@ -1,5 +1,6 @@
 #pragma once
 #include <QThread>
+#include <QTime>
 #include <functional>
 #include <algorithm>
 #include "unit.h"
@@ -23,10 +24,14 @@ public:
     {}
     virtual void run() override
     {
+        QDateTime start = QDateTime::currentDateTime();
         sortfunc_(array_, array_+arraysize_);
-        emit end_of_run();
+        QDateTime finish = QDateTime::currentDateTime();
+        qint64 ms = start.msecsTo(finish);
+
+        emit end_of_run(ms);
     }
 
 signals:
-    void end_of_run();
+    void end_of_run(qint64 ms);
 };
